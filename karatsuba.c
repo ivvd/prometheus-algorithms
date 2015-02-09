@@ -175,6 +175,29 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_init("0", &ab_mul_cd);
     vl_init("0", &ad_plus_bc);
 
+    vl_print(op1);
+    vl_print(op2);
+    printf("\n-----\n");
+
+    if((op1->dim == 1) && (op2->dim == 1))
+    {
+        int8_t temp;
+        temp = op1->numb[0] * op2->numb[0];
+        if(temp > 9)
+        {
+            result->dim = 2;
+            result->numb[0] = temp - temp/10;
+            result->numb[1] = temp/10;
+        }
+        else
+        {
+            result->dim = 1;
+            result->numb[0] = temp;
+        }
+        vl_print(result);
+        return;
+    }
+
     vl_make_half(op1, &a, &b);
     vl_make_half(op2, &c, &d);
     
@@ -185,46 +208,54 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_mul(&a_plus_b, &c_plus_d, &ab_mul_cd);
     vl_sub(&ab_mul_cd, &ac, &ad_plus_bc);
     vl_sub(&ad_plus_bc, &bd, &ad_plus_bc);
-    
-    if((a.dim == 1) || (c.dim == 1))
-    {
-        return;
-    }
+
+    vl_mul10(&bd, 0, result);
+    vl_mul10(&ad_plus_bc, a.dim, result);
+    vl_mul10(&ac, op1->dim, result);
+
+    vl_print(result);
+    //vl_print(&ad_plus_bc);
 }
 
 int main(void)
 {
 	verylong_t num1, num2, result;
-	vl_init("123456789923456789", &num1);
-	vl_init("923456789678324098", &num2);
-	vl_init("0", &result);
-	vl_print(&num1);
-	vl_print(&num2);
-	vl_sum(&num1, &num2, &result);
-	vl_print(&result);
+//	vl_init("123456789923456789", &num1);
+//	vl_init("923456789678324098", &num2);
+//	vl_init("0", &result);
+//	vl_print(&num1);
+//	vl_print(&num2);
+//	vl_sum(&num1, &num2, &result);
+//	vl_print(&result);
+//
+//	vl_init("6857434592", &num1);
+//	vl_init("2334654654", &num2);
+//	vl_init("0", &result);
+//	vl_print(&num1);
+//	vl_print(&num2);
+//	vl_sub(&num1, &num2, &result);
+//	vl_print(&result);
+//	
+//	vl_init("123", &num1);
+//	vl_init("0", &result);
+//	vl_print(&num1);
+//	vl_mul10(&num1, 3, &result);
+//	vl_print(&result);
+//	
+//    verylong_t a, b;
+//	vl_init("1234", &num1);
+//	vl_init("0", &a);
+//	vl_init("0", &b);
+//	vl_print(&num1);
+//    vl_make_half(&num1, &a, &b);
+//	vl_print(&a);
+//    vl_print(&b);
 
-	vl_init("6857434592", &num1);
-	vl_init("2334654654", &num2);
+	vl_init("12", &num1);
+	vl_init("34", &num2);
 	vl_init("0", &result);
-	vl_print(&num1);
-	vl_print(&num2);
-	vl_sub(&num1, &num2, &result);
-	vl_print(&result);
-	
-	vl_init("123", &num1);
-	vl_init("0", &result);
-	vl_print(&num1);
-	vl_mul10(&num1, 3, &result);
-	vl_print(&result);
-	
-    verylong_t a, b;
-	vl_init("1234", &num1);
-	vl_init("0", &a);
-	vl_init("0", &b);
-	vl_print(&num1);
-    vl_make_half(&num1, &a, &b);
-	vl_print(&a);
-    vl_print(&b);    
+    vl_mul(&num1, &num2, &result);
+    vl_print(&result);
 
 	return 0;
 }
