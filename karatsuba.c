@@ -130,29 +130,44 @@ void vl_mul10(verylong_t *op1, uint8_t exp, verylong_t *result)
 	}
 }
 
-void vl_make_half(verylong_t *op, verylong_t *a, verylong_t *b)
+void vl_make_half(verylong_t *op1, verylong_t *op2, verylong_t *a, verylong_t *b, verylong_t *c, verylong_t *d)
 {
     uint8_t half = 0;
     uint8_t i = 0;
+    uint8_t max_dim = op2->dim;
 
-    if(op->dim % 2)
+    if(op1->dim > op2->dim)
     {
-        half = (op->dim / 2) + 1;
+        max_dim = op2->dim;
+    }
+
+    if(max_dim % 2)
+    {
+        half = (max_dim / 2) + 1;
     }
     else
     {
-        half = (op->dim / 2);
+        half = (max_dim / 2);
     }
 
-    a->dim = b->dim = half;
+    a->dim = b->dim = c->dim = d->dim = half;
 
     for(i=0; i<half; i++)
     {
-        b->numb[i] = op->numb[i];
+        b->numb[i] = op1->numb[i];
     }
-    for(i=half; i<op->dim; i++)
+    for(i=half; i<op1->dim; i++)
     {
-        a->numb[i-half] = op->numb[i];
+        a->numb[i-half] = op1->numb[i];
+    }
+
+    for(i=0; i<half; i++)
+    {
+        d->numb[i] = op2->numb[i];
+    }
+    for(i=half; i<op2->dim; i++)
+    {
+        c->numb[i-half] = op2->numb[i];
     }
 }
 
@@ -177,9 +192,9 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_init("0", &ad_plus_bc);
     vl_init("0", &temp);
 
-    //vl_print(op1);
-    //vl_print(op2);
-    //printf("\n-----\n");
+    vl_print(op1);
+    vl_print(op2);
+    printf("\n-----\n");
 
     if((op1->dim == 1) && (op2->dim == 1))
     {
@@ -196,12 +211,11 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
             result->dim = 1;
             result->numb[0] = temp;
         }
-        //vl_print(result);
+        vl_print(result);
         return;
     }
 
-    vl_make_half(op1, &a, &b);
-    vl_make_half(op2, &c, &d);
+    vl_make_half(op1, op2, &a, &b, &c, &d);
     
     vl_mul(&a, &c, &ac);
     vl_mul(&b, &d, &bd);
@@ -218,7 +232,11 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_mul10(&ac, op1->dim, &temp);
     vl_sum(&temp, result, result);
 
-    //vl_print(result);
+    printf("Result:\n");
+    vl_print(&bd);
+    vl_print(&ad_plus_bc);
+    vl_print(&ac);
+    vl_print(result);
     //vl_print(&ad_plus_bc);
 }
 
@@ -247,17 +265,23 @@ int main(void)
 //	vl_mul10(&num1, 3, &result);
 //	vl_print(&result);
 //	
-//    verylong_t a, b;
-//	vl_init("1234", &num1);
+//    verylong_t a, b, c, d;
+//	vl_init("46", &num1);
+//	vl_init("134", &num2);
 //	vl_init("0", &a);
 //	vl_init("0", &b);
+//	vl_init("0", &c);
+//	vl_init("0", &d);
 //	vl_print(&num1);
-//    vl_make_half(&num1, &a, &b);
+//	vl_print(&num2);
+//    vl_make_half(&num1, &num2, &a, &b, &c, &d);
 //	vl_print(&a);
 //    vl_print(&b);
+//    vl_print(&c);
+//    vl_print(&d);
 
-	vl_init("123", &num1);
-	vl_init("456", &num2);
+	vl_init("1234", &num1);
+	vl_init("5678", &num2);
     vl_print(&num1);
     vl_print(&num2);
 	vl_init("0", &result);
