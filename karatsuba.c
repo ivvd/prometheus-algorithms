@@ -229,7 +229,7 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_mul10(&ad_plus_bc, a.dim, &temp);
     vl_sum(&temp, result, result);
     vl_init("0", &temp);
-    vl_mul10(&ac, op1->dim, &temp);
+    vl_mul10(&ac, (a.dim * 2), &temp);
     vl_sum(&temp, result, result);
 
     printf("Result:\n");
@@ -280,8 +280,8 @@ int main(void)
 //    vl_print(&c);
 //    vl_print(&d);
 
-	vl_init("1234", &num1);
-	vl_init("5678", &num2);
+	vl_init("49823261", &num1);
+	vl_init("44269423", &num2);
     vl_print(&num1);
     vl_print(&num2);
 	vl_init("0", &result);
