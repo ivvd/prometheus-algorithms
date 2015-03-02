@@ -4,7 +4,7 @@
 
 #define CHAR2INT(c)		((c) - 0x30)
 #define INT2CHAR(i)		((i) + 0x30)
-#define MAX_DIM			50
+#define MAX_DIM			512
 
 typedef struct
 {
@@ -136,10 +136,14 @@ void vl_make_half(verylong_t *op1, verylong_t *op2, verylong_t *a, verylong_t *b
     uint8_t i = 0;
     uint8_t max_dim = op2->dim;
 
+//    printf("op1->dim = %i\n", op1->dim);
+
     if(op1->dim > op2->dim)
     {
-        max_dim = op2->dim;
+        max_dim = op1->dim;
     }
+
+//    printf("max_dim = %i\n", max_dim);
 
     if(max_dim % 2)
     {
@@ -149,6 +153,8 @@ void vl_make_half(verylong_t *op1, verylong_t *op2, verylong_t *a, verylong_t *b
     {
         half = (max_dim / 2);
     }
+
+//    printf("half = %i\n", half);
 
     a->dim = b->dim = c->dim = d->dim = half;
 
@@ -280,8 +286,10 @@ int main(void)
 //    vl_print(&c);
 //    vl_print(&d);
 
-	vl_init("49823261", &num1);
-	vl_init("44269423", &num2);
+	vl_init("1685287499328328297814655639278583667919355849391453456921116729", &num1);
+	vl_init("7114192848577754587969744626558571536728983167954552999895348492", &num2);
+//	vl_init("131", &num1);
+//	vl_init("70", &num2);
     vl_print(&num1);
     vl_print(&num2);
 	vl_init("0", &result);
