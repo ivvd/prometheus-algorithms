@@ -198,9 +198,9 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_init("0", &ad_plus_bc);
     vl_init("0", &temp);
 
-    vl_print(op1);
-    vl_print(op2);
-    printf("\n-----\n");
+    //vl_print(op1);
+    //vl_print(op2);
+    //printf("\n-----\n");
 
     if((op1->dim == 1) && (op2->dim == 1))
     {
@@ -217,7 +217,7 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
             result->dim = 1;
             result->numb[0] = temp;
         }
-        vl_print(result);
+        //vl_print(result);
         return;
     }
 
@@ -238,12 +238,12 @@ void vl_mul(verylong_t *op1, verylong_t *op2, verylong_t *result)
     vl_mul10(&ac, (a.dim * 2), &temp);
     vl_sum(&temp, result, result);
 
-    printf("Result:\n");
-    vl_print(&bd);
+//    printf("Result:\n");
+//    vl_print(&bd);
+//    vl_print(&ad_plus_bc);
+//    vl_print(&ac);
+//    vl_print(result);
     vl_print(&ad_plus_bc);
-    vl_print(&ac);
-    vl_print(result);
-    //vl_print(&ad_plus_bc);
 }
 
 int main(void)
@@ -286,8 +286,8 @@ int main(void)
 //    vl_print(&c);
 //    vl_print(&d);
 
-	vl_init("1685287499328328297814655639278583667919355849391453456921116729", &num1);
-	vl_init("7114192848577754587969744626558571536728983167954552999895348492", &num2);
+	vl_init("34215432964249374812219364786397", &num1);
+	vl_init("94541964835273822784327848699719", &num2);
 //	vl_init("131", &num1);
 //	vl_init("70", &num2);
     vl_print(&num1);
