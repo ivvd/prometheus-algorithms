@@ -11,6 +11,8 @@ typedef struct
 }Heap_t;
 
 void print_heap(Heap_t *heap, char *end);
+void min_heapify(Heap_t *heap, int x);
+void max_heapify(Heap_t *heap, int x);
 
 void max_heapify(Heap_t *heap, int x)
 {
@@ -45,6 +47,42 @@ void build_max_heap(Heap_t *heap)
         max_heapify(heap, i);
         --i;
     }
+}
+
+int heap_extract_max(Heap_t *heap)
+{
+    int max = heap->data[0];
+    heap->data[0] = heap->data[heap->size-1];
+    heap->size -= 1;
+    max_heapify(heap, 0);
+    return max;
+}
+
+int heap_extract_min(Heap_t *heap)
+{
+    int min = heap->data[0];
+    heap->data[0] = heap->data[heap->size-1];
+    heap->size -= 1;
+    min_heapify(heap, 0);
+    return min;
+}
+
+void max_heap_increase_key(Heap_t *heap, int x, int key)
+{
+    heap->data[x] = key;
+    while((x > 0) && (heap->data[HEAP_PARENT(x)] < heap->data[x]))
+    {
+        int temp = heap->data[HEAP_PARENT(x)];
+        heap->data[HEAP_PARENT(x)] = heap->data[x];
+        heap->data[x] = temp;
+        x = HEAP_PARENT(x);
+    }
+}
+
+void max_heap_insert(Heap_t *heap, int key)
+{
+    heap->size += 1;
+    max_heap_increase_key(heap, heap->size-1, key);
 }
 
 void min_heapify(Heap_t *heap, int x)
@@ -82,6 +120,24 @@ void build_min_heap(Heap_t *heap)
     }
 }
 
+void min_heap_increase_key(Heap_t *heap, int x, int key)
+{
+    heap->data[x] = key;
+    while((x > 0) && (heap->data[HEAP_PARENT(x)] > heap->data[x]))
+    {
+        int temp = heap->data[HEAP_PARENT(x)];
+        heap->data[HEAP_PARENT(x)] = heap->data[x];
+        heap->data[x] = temp;
+        x = HEAP_PARENT(x);
+    }
+}
+
+void min_heap_insert(Heap_t *heap, int key)
+{
+    heap->size += 1;
+    min_heap_increase_key(heap, heap->size-1, key);
+}
+
 void print_heap(Heap_t *heap, char *end)
 {
     int i;
@@ -103,6 +159,8 @@ int main(int argc, const char *argv[])
 
     print_heap(&my_heap, "\n");
     build_min_heap(&my_heap);
+    print_heap(&my_heap, "\n");
+    min_heap_insert(&my_heap, 1);
     print_heap(&my_heap, "\n");
 
     return 0;
