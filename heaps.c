@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define HEAP_PARENT(x)  (x-1)/2
 #define HEAP_LEFT(x)    2*(x)+1
@@ -152,16 +153,52 @@ int main(int argc, const char *argv[])
 {
     printf("Hello!\n");
 
-    int arr[10] = {4, 1, 3, 2, 16, 9, 10, 14, 8, 7};
-    Heap_t my_heap;
-    my_heap.size = 10;
-    my_heap.data = arr;
+    if(argc == 1)
+    {
+        int arr[10] = {4, 1, 3, 2, 16, 9, 10, 14, 8, 7};
+        Heap_t my_heap;
+        my_heap.size = 10;
+        my_heap.data = arr;
 
-    print_heap(&my_heap, "\n");
-    build_min_heap(&my_heap);
-    print_heap(&my_heap, "\n");
-    min_heap_insert(&my_heap, 1);
-    print_heap(&my_heap, "\n");
+        print_heap(&my_heap, "\n");
+        build_min_heap(&my_heap);
+        print_heap(&my_heap, "\n");
+        min_heap_insert(&my_heap, 1);
+        print_heap(&my_heap, "\n");
+    }
+    else if(argc == 2)
+    {
+        printf("Opening file %s...\n", argv[1]);
+
+        FILE *fp;
+        int arr_len = 0;
+        int new_numb = 0;
+        int i = 0;
+        int *arr;
+
+        fp = fopen(argv[1], "r");
+        fscanf(fp, "%i", &arr_len);
+        arr = malloc(arr_len*sizeof(int));
+        
+        while(fscanf(fp, "%i", &new_numb) != EOF)
+        {
+            arr[i++] = new_numb;
+        }
+        
+        printf("%i\n", arr_len);
+        for(i = 0; i < arr_len; i++)
+        {
+            printf("%i ", arr[i]);
+        }
+        printf("\n");
+        
+        fclose(fp);
+        free(arr);
+    }
+    else
+    {
+        printf("Wrong number of parameters!\n");
+    }
 
     return 0;
 }
