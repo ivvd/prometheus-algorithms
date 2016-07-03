@@ -15,6 +15,13 @@ typedef struct tree_node
     struct tree_node *right;
 }BinaryTree_t;
 
+struct 
+{
+    int sum;
+    int cntr;
+    int list[10];
+}find_path_data;
+
 BinaryTree_t* make_node(const int *key, BinaryTree_t *parent, unsigned int *count, int dir);
 void inorder_tree_walk(BinaryTree_t *tree);
 void inorder_tree_walk_store(BinaryTree_t *tree, int **buff);
@@ -23,12 +30,14 @@ int compare(const void *a, const void *b);
 void print_tree(BinaryTree_t *tree);
 int print_t(BinaryTree_t *tree);
 void print_leafs(BinaryTree_t *tree);
+void find_all_paths(BinaryTree_t *tree, int path[], int path_len);
+void find_path(BinaryTree_t *tree, int path[], int path_len, int number);
 
 int n = 0;
 
 int main(int argc, const char *argv[])
 {
-    if(argc == 2)
+    if(argc == 3)
     {
         printf("Hello!\n");
         
@@ -38,6 +47,10 @@ int main(int argc, const char *argv[])
         int *arr, *tmp;
         printf("Opening file %s...\n", argv[1]);
         fp = fopen(argv[1], "r");
+
+        /* Print third parameter - the sum for which we will find the path */
+        int path_sum = atoi(argv[2]);
+        printf("Will find path for sum %i.\n", path_sum);
         
         /* Find number of elements */
         while(fscanf(fp, "%i", &x) != EOF)
@@ -76,10 +89,6 @@ int main(int argc, const char *argv[])
         int i = 0;
         root = make_node(arr, 0, &i, LEFT);
 
-        /* Inorder print */
-        //inorder_tree_walk(root);
-        //printf("\n");
-        
         /* Store tree to array */
         int *tree_buff = malloc(node_number*sizeof(int));
         int *buff_p = tree_buff;
@@ -108,6 +117,10 @@ int main(int argc, const char *argv[])
         //print_tree(root);
         //print_t(root);
         
+        /* Inorder print */
+        //inorder_tree_walk(root);
+        //printf("\n");
+        
         /* Print tree leafs */
         printf("Leafs: ");
         print_leafs(root);
@@ -115,7 +128,18 @@ int main(int argc, const char *argv[])
 
         /* Print root */
         printf("Root: %i\n", root->key);
+
+        /* Print all root to leaf paths */
+        int down_path[300];
+        int down_path_len = 0;
+        //printf("-------\n");
+        //find_all_paths(root, down_path, down_path_len);
+        //printf("-------\n");
         
+        /* Find path with sum */
+        down_path_len = 0;
+        find_path(root, down_path, down_path_len, path_sum);
+
         /* Free resources */
         fclose(fp);
         free(arr);
@@ -234,6 +258,58 @@ void print_tree(BinaryTree_t *tree)
     }
 }
 
+/* Find all root to leaf paths */
+void find_all_paths(BinaryTree_t *tree, int path[], int path_len)
+{
+    if(tree != 0)
+    {
+        path[path_len++] = tree->key;
+
+        if(tree->left == 0 && tree->right == 0)
+        {
+            int i;
+            for(i = 0; i < path_len; i++)
+            {
+                printf("%i ", path[i]);
+            }
+            printf("\n");
+        }
+        else
+        {
+            find_all_paths(tree->left, path, path_len);
+            find_all_paths(tree->right, path, path_len);
+        }
+    }
+}
+
+/* Find downgrade path which element's sum equal to parameter. */
+void find_path(BinaryTree_t *tree, int path[], int path_len, int number)
+{
+    if(tree != 0)
+    {
+        path[path_len++] = tree->key;
+
+        int i, sum = 0;
+        for(i = path_len-1; i >= 0; i--)
+        {
+            sum += path[i];
+            if(sum == number)
+            {
+                int j;
+                for(j = i; j < path_len; j++)
+                {
+                    printf("%i ", path[j]);
+                }
+                printf("\n");
+                break;
+            }
+        }
+
+        find_path(tree->left, path, path_len, number);
+        find_path(tree->right, path, path_len, number);
+    }
+}
+
 #define TREE_LINES  100
 #define LINE_LENGTH 1000
 
@@ -290,5 +366,7 @@ int print_t(BinaryTree_t *tree)
     _print_t(tree, 0, 0, 0, s);
 
     for (i = 0; i < TREE_LINES; i++)
+    {
         printf("%s\n", s[i]);
+    }
 }
