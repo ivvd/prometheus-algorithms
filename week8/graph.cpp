@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stack>
 #include <utility>
 
 typedef std::pair <std::vector<int>::iterator,
@@ -51,6 +52,7 @@ public:
 	void print(void);
 	void add_edge(int vertex, int edge);
 	void load(const char* file_path);
+	void dfs(int vertex);
 };
 
 void Graph::add_edge(int vertex, int edge)
@@ -79,6 +81,14 @@ void Graph::print(void)
 			std::cout << *edge_it.first << " ";
 			edge_it.first++;
 		}
+		if(gv.is_examined())
+		{
+			std::cout << " :e";
+		}
+		else
+		{
+			std::cout << " :ne";
+		}
 		std::cout << std::endl;
 		++i;
 	}
@@ -102,6 +112,39 @@ void Graph::load(const char* file_path)
 	file.close();	
 }
 
+void Graph::dfs(int vertex)
+{
+	std::stack<int> s;
+	vertex_list[vertex].examine();
+	s.push(vertex);
+	while(!s.empty())
+	{
+		int v = s.top();
+		int u;
+		edge_list_iter edge_it = vertex_list[v].get_edge_list();
+		
+		while(edge_it.first != edge_it.second)
+		{
+			u = *edge_it.first;
+			if(vertex_list[u].is_examined() == false)
+			{
+				break;
+			}
+			edge_it.first++;
+		}
+		
+		if(edge_it.first != edge_it.second)
+		{
+			vertex_list[u].examine();
+			s.push(u);
+		}
+		else
+		{
+			s.pop();
+		}
+	}
+}
+
 int main(int argc, const char *argv[])
 {
 	std::cout << "Hello!" << std::endl;
@@ -113,6 +156,7 @@ int main(int argc, const char *argv[])
 	dummy_graph.add_edge(2, 1);
 	dummy_graph.add_edge(2, 3);
 	dummy_graph.add_edge(3, 2);
+	dummy_graph.dfs(1);
 	dummy_graph.print();
 	
 	std::cout << std::endl << std::endl;
@@ -121,6 +165,7 @@ int main(int argc, const char *argv[])
 	{
 		Graph file_graph;
 		file_graph.load(argv[1]);
+		file_graph.dfs(2);
 		file_graph.print();
 	}
 	
