@@ -12,10 +12,12 @@ class GraphVertex
 private:
 	std::vector<int> edge_list;
 	bool examined;
+	int t;
 public:
 	GraphVertex(void)
 	{
 		examined = false;
+		t = 0;
 	}
 	
 	bool is_examined(void)
@@ -37,6 +39,16 @@ public:
 	{
 		return std::make_pair(edge_list.begin(), edge_list.end());
 	}
+	
+	void set_t(int new_t)
+	{
+		t = new_t;
+	}
+	
+	int get_t(void)
+	{
+		return t;
+	}
 };
 
 class Graph
@@ -52,7 +64,8 @@ public:
 	void print(void);
 	void add_edge(int vertex, int edge);
 	void load(const char* file_path);
-	void dfs(int vertex);
+	void dfs(int vertex, int& t);
+	void dfs_loop(void);
 };
 
 void Graph::add_edge(int vertex, int edge)
@@ -75,20 +88,26 @@ void Graph::print(void)
 	{
 		GraphVertex gv = *it;
 		edge_list_iter edge_it = gv.get_edge_list();
-		std::cout << i << ": ";
+		
+		std::cout << i << ";\t";
+		
+		if(gv.is_examined())
+		{
+			std::cout << "e;\t";
+		}
+		else
+		{
+			std::cout << "ne;\t";
+		}
+		
+		std::cout << "t = " << gv.get_t() << ":\t";
+		
 		while(edge_it.first != edge_it.second)
 		{
 			std::cout << *edge_it.first << " ";
 			edge_it.first++;
 		}
-		if(gv.is_examined())
-		{
-			std::cout << " :e";
-		}
-		else
-		{
-			std::cout << " :ne";
-		}
+		
 		std::cout << std::endl;
 		++i;
 	}
@@ -112,7 +131,7 @@ void Graph::load(const char* file_path)
 	file.close();	
 }
 
-void Graph::dfs(int vertex)
+void Graph::dfs(int vertex, int& t)
 {
 	std::stack<int> s;
 	vertex_list[vertex].examine();
@@ -140,7 +159,21 @@ void Graph::dfs(int vertex)
 		}
 		else
 		{
+			t += 1;
+			vertex_list[v].set_t(t);
 			s.pop();
+		}
+	}
+}
+
+void Graph::dfs_loop(void)
+{
+	int t = 0;
+	for(int i = 1; i < vertex_list.size(); i++)
+	{
+		if(vertex_list[i].is_examined() == false)
+		{
+			dfs(i, t);
 		}
 	}
 }
@@ -149,15 +182,14 @@ int main(int argc, const char *argv[])
 {
 	std::cout << "Hello!" << std::endl;
 	
-	Graph dummy_graph;
-	dummy_graph.add_edge(1, 1);
-	dummy_graph.add_edge(1, 2);
-	dummy_graph.add_edge(1, 3);
-	dummy_graph.add_edge(2, 1);
-	dummy_graph.add_edge(2, 3);
-	dummy_graph.add_edge(3, 2);
-	dummy_graph.dfs(1);
-	dummy_graph.print();
+	// Graph dummy_graph;
+	// dummy_graph.add_edge(1, 1);
+	// dummy_graph.add_edge(1, 2);
+	// dummy_graph.add_edge(1, 3);
+	// dummy_graph.add_edge(2, 1);
+	// dummy_graph.add_edge(2, 3);
+	// dummy_graph.add_edge(3, 2);
+	// dummy_graph.print();
 	
 	std::cout << std::endl << std::endl;
 	
@@ -165,8 +197,12 @@ int main(int argc, const char *argv[])
 	{
 		Graph file_graph;
 		file_graph.load(argv[1]);
-		file_graph.dfs(2);
+		file_graph.dfs_loop();
 		file_graph.print();
+	}
+	else
+	{
+		
 	}
 	
 	return 0;
