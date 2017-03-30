@@ -62,23 +62,22 @@ public:
 		vertex_list.push_back(gv);
 	};
 	void print(void);
-	void add_edge(int vertex, int edge);
+	void add_edge(int from, int to);
 	void load(const char* file_path);
 	void dfs(int vertex, int& t);
 	void dfs_loop(void);
 };
 
-void Graph::add_edge(int vertex, int edge)
+void Graph::add_edge(int from, int to)
 {
-	if(vertex > vertex_list.size() - 1)
+	int max = std::max(from, to);
+	
+	if(max > vertex_list.size() - 1)
 	{
-		vertex_list.resize(vertex + 1);
-		vertex_list[vertex].add_edge(edge);
+		vertex_list.resize(max + 1);
 	}
-	else
-	{
-		vertex_list[vertex].add_edge(edge);
-	}
+	
+	vertex_list[from].add_edge(to);
 }
 
 void Graph::print(void)
