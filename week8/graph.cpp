@@ -4,9 +4,6 @@
 #include <stack>
 #include <utility>
 
-typedef std::pair <std::vector<int>::iterator,
-				   std::vector<int>::iterator> edge_list_iter;
-
 class GraphVertex
 {
 private:
@@ -19,6 +16,9 @@ public:
 		examined = false;
 		t = 0;
 	}
+	
+	typedef std::pair <std::vector<int>::iterator,
+				       std::vector<int>::iterator> edge_list_iter;
 	
 	bool is_examined(void)
 	{
@@ -61,11 +61,17 @@ public:
 		GraphVertex gv;
 		vertex_list.push_back(gv);
 	};
+	typedef std::pair <std::vector<GraphVertex>::iterator,
+				       std::vector<GraphVertex>::iterator> vertex_list_iter;
 	void print(void);
 	void add_edge(int from, int to);
 	void load(const char* file_path);
 	void dfs(int vertex, int& t);
 	void dfs_loop(void);
+	vertex_list_iter get_vertex_list(void)
+	{
+		return std::make_pair(vertex_list.begin(), vertex_list.end());
+	}
 };
 
 void Graph::add_edge(int from, int to)
@@ -83,10 +89,11 @@ void Graph::add_edge(int from, int to)
 void Graph::print(void)
 {
 	int i = 0;
+	std::cout << std::endl;
 	for(std::vector<GraphVertex>::iterator it = vertex_list.begin(); it != vertex_list.end(); it++)
 	{
 		GraphVertex gv = *it;
-		edge_list_iter edge_it = gv.get_edge_list();
+		GraphVertex::edge_list_iter edge_it = gv.get_edge_list();
 		
 		std::cout << i << ";\t";
 		
@@ -123,8 +130,11 @@ void Graph::load(const char* file_path)
 		int first, second;
 		file >> first;
 		file >> second;
-		//std::cout << first << " " << second << std::endl;
-		add_edge(first, second);
+		if(!file.eof())
+		{
+			//std::cout << first << " " << second << std::endl;
+			add_edge(first, second);
+		}
 	}
 	
 	file.close();	
@@ -139,7 +149,7 @@ void Graph::dfs(int vertex, int& t)
 	{
 		int v = s.top();
 		int u;
-		edge_list_iter edge_it = vertex_list[v].get_edge_list();
+		GraphVertex::edge_list_iter edge_it = vertex_list[v].get_edge_list();
 		
 		while(edge_it.first != edge_it.second)
 		{
@@ -177,6 +187,23 @@ void Graph::dfs_loop(void)
 	}
 }
 
+void graph_transpose(Graph& g, Graph& gt)
+{
+	Graph::vertex_list_iter vi = g.get_vertex_list();
+	int i = 0;
+	while(vi.first != vi.second)
+	{
+		GraphVertex::edge_list_iter ei = (*vi.first).get_edge_list();
+		while(ei.first != ei.second)
+		{
+			gt.add_edge(*ei.first, i);
+			ei.first++;
+		}
+		i++;
+		vi.first++;
+	}
+}
+
 int main(int argc, const char *argv[])
 {
 	std::cout << "Hello!" << std::endl;
@@ -198,6 +225,10 @@ int main(int argc, const char *argv[])
 		file_graph.load(argv[1]);
 		file_graph.dfs_loop();
 		file_graph.print();
+		
+		Graph transposed_graph;
+		graph_transpose(file_graph, transposed_graph);
+		transposed_graph.print();
 	}
 	else
 	{
