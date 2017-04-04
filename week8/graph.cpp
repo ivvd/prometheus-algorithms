@@ -3,6 +3,7 @@
 #include <vector>
 #include <stack>
 #include <utility>
+#include <algorithm>
 
 class GraphVertex
 {
@@ -66,8 +67,9 @@ public:
 	void print(void);
 	void add_edge(int from, int to);
 	void load(const char* file_path);
-	void dfs(int vertex, int& t);
-	void dfs_loop(void);
+	void dfs(int vertex, int& t, std::vector<int>& order);
+	void dfs_loop(std::vector<int>& order_out);
+	void dfs_loop_t(std::vector<int>& order_in, std::vector<int>& component_list);
 	vertex_list_iter get_vertex_list(void)
 	{
 		return std::make_pair(vertex_list.begin(), vertex_list.end());
@@ -140,7 +142,7 @@ void Graph::load(const char* file_path)
 	file.close();	
 }
 
-void Graph::dfs(int vertex, int& t)
+void Graph::dfs(int vertex, int& t, std::vector<int>& order)
 {
 	std::stack<int> s;
 	vertex_list[vertex].examine();
@@ -170,21 +172,41 @@ void Graph::dfs(int vertex, int& t)
 		{
 			t += 1;
 			vertex_list[v].set_t(t);
+			order.push_back(v);
 			s.pop();
 		}
 	}
 }
 
-void Graph::dfs_loop(void)
+void Graph::dfs_loop(std::vector<int>& order_out)
 {
 	int t = 0;
+	
 	for(int i = 1; i < vertex_list.size(); i++)
 	{
 		if(vertex_list[i].is_examined() == false)
 		{
-			dfs(i, t);
+			dfs(i, t, order_out);
 		}
 	}
+}
+
+void Graph::dfs_loop_t(std::vector<int>& order_in, std::vector<int>& component_list)
+{
+	int t = 0;
+	std::vector<int> temp;
+	
+	for(std::vector<int>::reverse_iterator rit = order_in.rbegin(); rit != order_in.rend(); rit++)
+	{
+		if(vertex_list[*rit].is_examined() == false)
+		{
+			t = 0;
+			dfs(*rit, t, temp);
+			component_list.push_back(temp.size());
+			temp.resize(0);
+		}
+	}	
+	std::cout << std::endl;
 }
 
 void graph_transpose(Graph& g, Graph& gt)
@@ -204,6 +226,8 @@ void graph_transpose(Graph& g, Graph& gt)
 	}
 }
 
+bool compare (int i, int j) { return (i > j); }
+
 int main(int argc, const char *argv[])
 {
 	std::cout << "Hello!" << std::endl;
@@ -221,14 +245,33 @@ int main(int argc, const char *argv[])
 	
 	if(argc == 2)
 	{
+		std::vector<int> order;
+		std::vector<int> component_list;
 		Graph file_graph;
+		
 		file_graph.load(argv[1]);
-		file_graph.dfs_loop();
-		file_graph.print();
+		file_graph.dfs_loop(order);
+		//file_graph.print();
+		
+		// for(std::vector<int>::iterator it = order.begin(); it != order.end(); it++)
+		// {
+			// std::cout << *it << " ";
+		// }
+		// std::cout << std::endl;
 		
 		Graph transposed_graph;
 		graph_transpose(file_graph, transposed_graph);
-		transposed_graph.print();
+		//transposed_graph.print();
+		
+		transposed_graph.dfs_loop_t(order, component_list);
+		
+		std::sort(component_list.begin(), component_list.end(), compare);
+		
+		for(std::vector<int>::iterator it = component_list.begin(); it != component_list.end(); it++)
+		{
+			std::cout << *it << " ";
+		}
+		std::cout << std::endl;
 	}
 	else
 	{
