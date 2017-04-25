@@ -8,6 +8,7 @@
 #include <utility>
 #include <algorithm>
 #include <climits>
+#include <cstdlib>
 
 const int biggest_label = 1000000000;
 
@@ -125,14 +126,15 @@ void dijkstra(Graph& g, int start)
 	
 	gv.set_label(0);
 	
+	//std::cout << "Graph size: " << g_size << std::endl;
+	
 	path.resize(g_size);
 	for(int i = 0; i < g_size; i++)
 	{
 		path[i].push_back(0);
 	}
 	
-	//for(int i = 0; i < g_size; i++)
-	do
+	for(int i = 1; i < g_size; i++)
 	{
 		gv = g.get_vertex(act_vertex);
 		GraphVertex::edge_list_iter edge_it = gv.get_edge_list();
@@ -161,22 +163,32 @@ void dijkstra(Graph& g, int start)
 			edge_it.first++;
 		}
 		
-		std::set<int>::iterator it;
-		std::set<int>::iterator min_vertex_it;
-		int min_label = INT_MAX;
-		for(it = search_set.begin(); it != search_set.end(); it++)
+		if(search_set.size() > 0)
 		{
-			GraphVertex& gv = g.get_vertex(*it);
-			if(gv.get_label() < min_label)
+			std::set<int>::iterator it;
+			std::set<int>::iterator min_vertex_it;
+			int min_label = INT_MAX;
+			for(it = search_set.begin(); it != search_set.end(); it++)
 			{
-				min_label = gv.get_label();
-				min_vertex_it = it;
+				GraphVertex& gv = g.get_vertex(*it);
+				if(gv.get_label() < min_label)
+				{
+					min_label = gv.get_label();
+					min_vertex_it = it;
+				}
 			}
+			act_vertex = *min_vertex_it;
+			
+			//std::cout << "min_label: " << min_label << "; min_vertex: " << act_vertex;
+			//std::cout << "; i: " << i << std::endl;
+			
+			search_set.erase(min_vertex_it);
 		}
-		act_vertex = *min_vertex_it;
-		search_set.erase(min_vertex_it);
+		else
+		{
+			break;
+		}
 	}
-	while(search_set.size() > 0);
 }
 
 void print_path_vector(void)
@@ -215,12 +227,20 @@ void print_first_path(int end)
 
 int main(int argc, const char *argv[])
 {
-	if(argc == 2)
+	if(argc == 2 || argc == 3)
 	{
 		Graph my_graph(argv[1]);
 		my_graph.print();
 		
-		dijkstra(my_graph, 1);
+		if(argc == 2)
+		{
+			dijkstra(my_graph, 1);
+		}
+		else
+		{
+			int start = atoi(argv[2]);
+			dijkstra(my_graph, start);
+		}
 		
 		int vertex = 7;
 		GraphVertex& gv = my_graph.get_vertex(vertex);
@@ -233,6 +253,7 @@ int main(int argc, const char *argv[])
 	else
 	{
 		std::cout << "Type input file as a parameter: dijkstra input.txt" << std::endl;
+		std::cout << "Or dijkstra input.txt start_vertex" << std::endl;
 	}
 	
 	return 0;
